@@ -31,4 +31,131 @@ app.listen(port, () => {
   console.log(`Smart-deals server listening on port ${port}`);
 });
 
+async function run() {
+  try {
+    await client.connect();
 
+    const db = client.db("finease_db");
+    const transactionCollection = db.collection("transactions");
+//     const bidsCollection = db.collection("bids");
+//     const usersCollection = db.collection("users");
+//     // USER APIs
+//     app.post("/users", async (req, res) => {
+//       const newUser = req.body;
+//       const email = req.body.email;
+//       const query = { email: email };
+//       const existingUser = await usersCollection.findOne(query);
+//       if (existingUser) {
+//         res.send({ message: "user already exist, no need to insert" });
+//       } else {
+//         const result = await usersCollection.insertOne(newUser);
+//         res.send(result);
+//       }
+//     });
+
+//     // Products APIs
+    app.get("/transactions", async (req, res) => {
+      // const projectField = {title: 1, price_min:1, price_max:1, image:1};
+      // const cursor = productsCollection.find().sort({price_min : 1}).skip(2).limit(2).project(projectField);
+      const cursor = transactionCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+//     // latest products
+//     app.get("/latest-products", async (req, res) => {
+//       const cursor = productsCollection
+//         .find()
+//         .sort({ created_at: -1 })
+//         .limit(6);
+//       const result = await cursor.toArray();
+//       res.send(result);
+//     });
+//     app.get("/products/:id", async (req, res) => {
+//       const id = req.params.id;
+//       const query = { _id: id };
+//       const result = await productsCollection.findOne(query);
+//       res.send(result);
+//     });
+
+    app.post("/transactions", async (req, res) => {
+      const newTransaction = req.body;
+    //   console.log('new transaction', newTransaction);
+      const result = await transactionCollection.insertOne(newTransaction);
+      res.send(result);
+    });
+
+//     app.patch("/products/:id", async (req, res) => {
+//       const id = req.params.id;
+//       const updatedProduct = req.body;
+//       const query = { _id: new ObjectId(id) };
+//       const update = {
+//         $set: {
+//           name: updatedProduct.name,
+//           price: updatedProduct.price,
+//         },
+//       };
+//       const result = await productsCollection.updateOne(query, update);
+//       res.send(result);
+//     });
+
+//     app.delete("/products/:id", async (req, res) => {
+//       const id = req.params.id;
+//       const query = { _id: new ObjectId(id) };
+//       const result = await productsCollection.deleteOne(query);
+//       res.send(result);
+//     });
+
+//     // bids related apis
+//     app.get("/bids", async (req, res) => {
+//       const email = req.query.email;
+//       const query = {};
+//       if (email) {
+//         query.buyer_email = email;
+//       }
+//       const cursor = bidsCollection.find(query);
+//       const result = await cursor.toArray();
+//       res.send(result);
+//     });
+
+//     app.get("/products/bids/:productId", async (req, res) => {
+//       const productId = req.params.productId;
+//       const query = { product: productId };
+//       const cursor = bidsCollection.find(query).sort({ bid_price: -1 });
+//       const result = await cursor.toArray();
+//       res.send(result);
+//     });
+
+//     app.get("/bids", async (req, res) => {
+//       const query = {};
+//       if (query.email) {
+//         query.buyer_email = email;
+//       }
+//       const cursor = bidsCollection.find(query);
+//       const result = await cursor.toArray();
+//       res.send(result);
+//     });
+
+//     app.post("/bids", async (req, res) => {
+//       const myBid = req.body;
+//       const result = await bidsCollection.insertOne(myBid);
+//       res.send(result);
+//     });
+
+//     app.delete("/bids/:id", async (req, res) => {
+//       const id = req.params.id;
+//       const query = { _id: new ObjectId(id) };
+//       const result = await bidsCollection.deleteOne(query);
+//       res.send(result);
+//     });
+
+    await client.db("admin").command({ ping: 1 });
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!"
+    );
+  } finally {
+    // Ensures that the client will close when you finish/error
+    // await client.close();
+  }
+}
+run().catch(console.dir);
