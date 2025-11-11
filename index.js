@@ -65,14 +65,12 @@ async function run() {
     //       const result = await cursor.toArray();
     //       res.send(result);
     //     });
-    //     app.get("/products/:id", async (req, res) => {
-    //       const id = req.params.id;
-    //       const query = { _id: id };
-    //       const result = await productsCollection.findOne(query);
-    //       res.send(result);
-    //     });
-
-
+    app.get("/transactions/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await transactionCollection.findOne(query);
+      res.send(result);
+    });
 
     // my-transactions
     app.get("/transactions", async (req, res) => {
@@ -95,19 +93,23 @@ async function run() {
       res.send(result);
     });
 
-    //     app.patch("/products/:id", async (req, res) => {
-    //       const id = req.params.id;
-    //       const updatedProduct = req.body;
-    //       const query = { _id: new ObjectId(id) };
-    //       const update = {
-    //         $set: {
-    //           name: updatedProduct.name,
-    //           price: updatedProduct.price,
-    //         },
-    //       };
-    //       const result = await productsCollection.updateOne(query, update);
-    //       res.send(result);
-    //     });
+    // Update a transaction by ID
+    app.patch("/transactions/update/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedTransaction = req.body;
+      const query = { _id: new ObjectId(id) };
+      const update = {
+        $set: {
+          type: updatedTransaction.type,
+          description: updatedTransaction.description,
+          category: updatedTransaction.category,
+          amount: updatedTransaction.amount,
+          date: updatedTransaction.date,
+        },
+      };
+      const result = await transactionCollection.updateOne(query, update);
+      res.send(result);
+    });
 
     //     app.delete("/products/:id", async (req, res) => {
     //       const id = req.params.id;
@@ -123,16 +125,6 @@ async function run() {
     //       const result = await cursor.toArray();
     //       res.send(result);
     //     });
-
-    // app.get("/transactions", async (req, res) => {
-    //   const query = {};
-    //   if (query.email) {
-    //     query.user_email = email;
-    //   }
-    //   const cursor = transactionCollection.find(query);
-    //   const result = await cursor.toArray();
-    //   res.send(result);
-    // });
 
     //     app.post("/bids", async (req, res) => {
     //       const myBid = req.body;
