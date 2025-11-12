@@ -31,7 +31,7 @@ async function run() {
 
     const db = client.db("finease_db");
     const transactionCollection = db.collection("transactions");
-    //     const bidsCollection = db.collection("bids");
+    //const bidsCollection = db.collection("bids");
     const usersCollection = db.collection("users");
     // USER APIs
     app.post("/users", async (req, res) => {
@@ -45,6 +45,18 @@ async function run() {
         const result = await usersCollection.insertOne(newUser);
         res.send(result);
       }
+    });
+
+    app.get("/users", async (req, res) => {
+      const email = req.query.email;
+      console.log("Fetching transactions for:", email);
+      const query = {};
+      if (email) {
+        query.email = email;
+      }
+      const cursor = usersCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
     });
 
     // Treansactions APIs
