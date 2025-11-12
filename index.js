@@ -59,6 +59,22 @@ async function run() {
       res.send(result);
     });
 
+    // Update a user info by ID
+    app.patch("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedUser = req.body;
+      const query = { _id: new ObjectId(id) };
+      const update = {
+        $set: {
+          name: updatedUser.name,
+          email: updatedUser.email,
+          image: updatedUser.image,
+        },
+      };
+      const result = await usersCollection.updateOne(query, update);
+      res.send(result);
+    });
+
     // Treansactions APIs
     // app.get("/transactions", async (req, res) => {
     //   // const projectField = {title: 1, price_min:1, price_max:1, image:1};
