@@ -27,7 +27,7 @@ app.get("/", (req, res) => {
 
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
 
     const db = client.db("finease_db");
     const transactionCollection = db.collection("transactions");
@@ -100,15 +100,54 @@ async function run() {
       res.send(result);
     });
 
-    // my-transactions
+    // my-transactions for each category
     app.get("/transactions", async (req, res) => {
+      const email = req.query.email;
+      const category = req.query.category;
+      console.log("Fetching transactions for:", email, "Category:", category);
+
+      // Both email and category filter together
+      const query = {};
+      if (email && category) {
+        query.user_email = email;
+        query.category = category;
+      } else if (email) {
+        query.user_email = email;
+      } else if (category) {
+        query.category = category;
+      }
+
+      try {
+        const result = await transactionCollection.find(query).toArray();
+        res.send(result);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+        res.status(500).send({ message: "Server error" });
+      }
+    });
+
+    // my-transactions sory by date
+    app.get("/transactions-date-sorted", async (req, res) => {
       const email = req.query.email;
       console.log("Fetching transactions for:", email);
       const query = {};
       if (email) {
         query.user_email = email;
       }
-      const cursor = transactionCollection.find(query);
+      const cursor = transactionCollection.find(query).sort({ date: -1 });
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // my-transactions sort by amount
+    app.get("/transactions-amount-sorted", async (req, res) => {
+      const email = req.query.email;
+      console.log("Fetching transactions for:", email);
+      const query = {};
+      if (email) {
+        query.user_email = email;
+      }
+      const cursor = transactionCollection.find(query).sort({ amount: -1 });
       const result = await cursor.toArray();
       res.send(result);
     });
@@ -168,7 +207,7 @@ async function run() {
       res.send(result);
     });
 
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
